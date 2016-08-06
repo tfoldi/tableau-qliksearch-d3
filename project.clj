@@ -1,6 +1,6 @@
 (defproject tableau-qliksearch-d3 "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "Tableau JS API Example with DS3 Viz and Qlik style filtering"
+  :url "https://github.com/tfoldi/tableau-qliksearch-d3"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
@@ -14,6 +14,9 @@
                  [compojure "1.5.0"]
                  [environ "1.0.3"]
                  [http-kit "2.1.19"]
+                 [com.taoensso/timbre "4.7.0"]
+                 [com.taoensso/encore "2.72.2"]
+                 [com.taoensso/sente "1.10.0"]
                  [reagent "0.6.0-rc"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
