@@ -6,7 +6,11 @@
             [ring.middleware.gzip :refer [wrap-gzip]]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [environ.core :refer [env]]
+<<<<<<< HEAD
             [org.httpkit.server :refer [run-server]])
+=======
+            [ring.adapter.jetty :refer [run-jetty]])
+>>>>>>> cebdd990e50d92d8214f90d4bc76acfbd33833f2
   (:gen-class))
 
 (defroutes routes
@@ -24,4 +28,8 @@
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 10555))]
+<<<<<<< HEAD
     (run-server http-handler {:port port :join? false})))
+=======
+    (run-jetty http-handler {:port port :join? false})))
+>>>>>>> cebdd990e50d92d8214f90d4bc76acfbd33833f2

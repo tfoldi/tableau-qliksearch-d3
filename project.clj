@@ -13,7 +13,10 @@
                  [ring.middleware.logger "0.5.0"]
                  [compojure "1.5.0"]
                  [environ "1.0.3"]
+<<<<<<< HEAD
                  [http-kit "2.1.19"]
+=======
+>>>>>>> cebdd990e50d92d8214f90d4bc76acfbd33833f2
                  [reagent "0.6.0-rc"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
