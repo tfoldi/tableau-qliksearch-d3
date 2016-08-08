@@ -20,7 +20,11 @@
 (let [packer :edn ; Default packer, a good choice in most cases
       chsk-server
       (sente/make-channel-socket-server!
-        (get-sch-adapter) {:packer packer})
+        (get-sch-adapter) 
+        {:packer packer
+         :user-id-fn  (fn [ring-req] 
+                              (debugf "new uid from handshake %s" (get-in ring-req [:params :uid]))
+                              (get-in ring-req [:params :uid]))})
 
       {:keys [ch-recv send-fn connected-uids
               ajax-post-fn ajax-get-or-ws-handshake-fn]}
@@ -40,13 +44,6 @@
       (infof "Connected uids change: %s" new))))
 
 
-(defn login-handler
-  [ring-req]
-  (let [{:keys [session params]} ring-req
-        {:keys [user-id]} params]
-    (debugf "Set user request: %s" params)
-    {:status 200 :session (assoc session :uid user-id)}))
-
 (defroutes routes
   (GET "/" _
     {:status 200
@@ -54,14 +51,13 @@
      :body (io/input-stream (io/resource "public/index.html"))})
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
-  (POST "/login" ring-req (login-handler                 ring-req))
 
   (resources "/"))
 
 (defn event-msg-handler
   "Wraps `-event-msg-handler` with logging, error catching, etc."
   [{:as ev-msg :keys [id ?data event]}]
-  (debugf "Unhandled event: %s" event)
+  (infof "Unhandled event: %s data %s id %s" event ?data id )
   ;;(-event-msg-handler ev-msg) ; Handle event-msgs on a single thread
   ;; (future (-event-msg-handler ev-msg)) ; Handle event-msgs on a thread pool
   )
@@ -78,11 +74,12 @@
 (defn  stop-router! [] (when-let [stop-fn @router_] (stop-fn)))
 (defn start-router! []
   (stop-router!)
+  (debugf "starting router")
   (reset! router_
     (sente/start-server-chsk-router! ch-chsk event-msg-handler)))
 
+(defonce _start-once (start-router!))
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 10555))]
-    (start-router!)
     (run-server http-handler {:port port :join? false})))

@@ -17,7 +17,11 @@
                  [com.taoensso/timbre "4.7.0"]
                  [com.taoensso/encore "2.72.2"]
                  [com.taoensso/sente "1.10.0"]
-                 [reagent "0.6.0-rc"]]
+                 [com.cemerick/url "0.1.1"]
+                 [cljsjs/jquery "2.2.2-0"]
+                 [cljsjs/bootstrap "3.3.6-1"]
+                 [reagent "0.6.0-rc"]
+                 [reagent-forms "0.5.24"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-environ "1.0.3"]]
