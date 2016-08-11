@@ -30,8 +30,12 @@
 
 (defn event-msg-handler
   "Handle incoming messages"
-  [{:as ev-msg :keys [id ?data event]}]
-  (debugf "message arrived %s" event))
+  [{:keys [id ?data ] [_ [tag]] :event}]
+  (condp = id
+    :chsk/state nil
+    :chsk/handshake (swap! state/app-state assoc id ?data)
+    (do (debugf "Incoming message id=%s tag=%s" id tag)
+        (swap! state/app-state assoc tag ?data))))
 
 ;;;; Sente event router (our `event-msg-handler` loop)
 (defonce router_ (atom nil))

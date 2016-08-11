@@ -22,9 +22,7 @@
       (sente/make-channel-socket-server!
         (get-sch-adapter) 
         {:packer packer
-         :user-id-fn  (fn [ring-req] 
-                              (debugf "new uid from handshake %s" (get-in ring-req [:params :uid]))
-                              (get-in ring-req [:params :uid]))})
+         :user-id-fn  (fn [ring-req] (get-in ring-req [:params :uid]))})
 
       {:keys [ch-recv send-fn connected-uids
               ajax-post-fn ajax-get-or-ws-handshake-fn]}
@@ -54,13 +52,26 @@
 
   (resources "/"))
 
+(defmulti -event-msg-handler
+  "Multimethod to handle Sente `event-msg`s"
+  :id ; Dispatch on event-id
+  )
+
 (defn event-msg-handler
   "Wraps `-event-msg-handler` with logging, error catching, etc."
-  [{:as ev-msg :keys [id ?data event]}]
-  (infof "Unhandled event: %s data %s id %s" event ?data id )
-  ;;(-event-msg-handler ev-msg) ; Handle event-msgs on a single thread
-  ;; (future (-event-msg-handler ev-msg)) ; Handle event-msgs on a thread pool
-  )
+  [ev-msg]
+  (future (-event-msg-handler ev-msg)))
+
+
+(defmethod -event-msg-handler :tableau/get-summary-data
+  [{:as ev-msg :keys [?data ?reply-fn] {:keys [origin]} :?data}]
+  (debugf "Request for summary data from %s" origin)
+  (chsk-send! origin [:tableau/get-summary-data]))
+
+(defmethod -event-msg-handler :tableau/summary-data
+  [{:as ev-msg :keys [?data] {:keys [origin]} :?data}]
+  (debugf "Sending back summary data to %s" origin)
+  (chsk-send! origin [:tableau/summary-data ?data]))
 
 (def http-handler
   (-> routes
@@ -74,7 +85,6 @@
 (defn  stop-router! [] (when-let [stop-fn @router_] (stop-fn)))
 (defn start-router! []
   (stop-router!)
-  (debugf "starting router")
   (reset! router_
     (sente/start-server-chsk-router! ch-chsk event-msg-handler)))
 
