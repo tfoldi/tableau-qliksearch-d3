@@ -38,23 +38,24 @@
   "Get summary data from `Category` sheet and store in state container"
   []
   (-> (get-sheet-in-active-sheet "Category")
-      (.getSummaryDataAsync (clj->js {:maxRows 1000}))
+      (.getSummaryDataAsync (clj->js {:maxRows 10}))
       (.then (fn [data]
                (let [cols (.getColumns data) rows (js->clj (.getData data) :keywordize-keys true )]
                (swap! app-state assoc 
                       :summary-columns (map  #(.getFieldName %) cols)
-                      :summary-data (walk #(mapv :value %) vec rows)))))))
+                      :summary-data (mapv #(mapv :value %) rows)))))))
 
 
 (when (= "container" state/controller)
   (state/when-change :tableau/get-summary-data
                      (fn []
-                       (swap! app-state dissoc :tableau/get-summary-data)
-                       (comm/chsk-send! 
-                         [:tableau/summary-data 
-                          (merge 
-                            (select-keys @app-state [:summary-data :summary-columns])
-                            {:origin (str state/uniq-id "/d3")})]))))
+                       (when (:summary-data @app-state) ; we have something to share
+                         (comm/chsk-send! 
+                           [:tableau/summary-data 
+                            (merge 
+                              (select-keys @app-state [:summary-data :summary-columns])
+                              {:origin (str state/uniq-id "/d3")})])
+                         (swap! app-state dissoc :tableau/get-summary-data)))))
 
 
 (def viz-options

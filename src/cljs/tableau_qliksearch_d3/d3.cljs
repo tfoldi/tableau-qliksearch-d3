@@ -16,9 +16,12 @@
 
 (defn receive-summary-data [data]
   (debugf "summary data arrived: %s" data)
-  (swap! app-state assoc :state :data-loaded))
+  (swap! app-state assoc :state :data-loaded)
+  (.getScript js/$ "js/reel.js" (swap! app-state assoc :state :d3-loaded) ))
 
 (defn request-summary-data []
+  ; retry every 3s if no response
+  (js/setTimeout #(when (nil? (:state @app-state)) (request-summary-data)) 3000 )
   (comm/chsk-send! [:tableau/get-summary-data {:origin (str state/uniq-id "/container")}] ))
 
 
@@ -28,6 +31,6 @@
 
 (defn app[]
   (condp = (:state @app-state)
-    :data-loaded [:h1 "yee"]
-    :error [:h2 "Error loading D3 viz.."]
+    :d3-loaded nil
+    :data-loaded [:h1 "Loading D3 viz..."]
     (init-load-page)))
