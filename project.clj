@@ -73,6 +73,7 @@
                            :output-dir "target"
                            :source-map-timestamp true
                            :optimizations :advanced
+                           :externs ["externs.js"]
                            :pretty-print false}}]}
 
   ;; When running figwheel from nREPL, figwheel will read this configuration

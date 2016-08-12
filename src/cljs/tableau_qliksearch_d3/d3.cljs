@@ -17,7 +17,7 @@
 (defn receive-summary-data [data]
   (debugf "summary data arrived: %s" data)
   (swap! app-state assoc :state :data-loaded)
-  (.getScript js/$ "js/reel.js" (swap! app-state assoc :state :d3-loaded) ))
+  (.getScript js/$ "/reel.js" (swap! app-state assoc :state :d3-loaded) ))
 
 (defn request-summary-data []
   ; retry every 3s if no response
