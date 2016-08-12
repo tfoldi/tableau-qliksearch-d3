@@ -22,7 +22,11 @@
 (defn embed-page[]
   [:div
    [:h1 "Embed D3 to Tableau Viz with " [:code "getData()"]  ]
-   [:div#viz-container]])
+   [:div#viz-container]
+   [:div
+    [:p "This demo viz uses Tableau 10's new " [:code "getData()"] " feature to retrieve data "
+     "from the javascript API and send to Viz's inner HTML container. Source codes are located "
+     [:a {:href "https://github.com/tfoldi/tableau-qliksearch-d3"} "here"] ". Blog post soon."]]])
 
 
 (defn get-sheet-in-active-sheet
