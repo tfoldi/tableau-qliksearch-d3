@@ -38,7 +38,7 @@
   "Get summary data from `Category` sheet and store in state container"
   []
   (-> (get-sheet-in-active-sheet "Category")
-      (.getSummaryDataAsync (clj->js {:maxRows 10}))
+      (.getSummaryDataAsync (clj->js {:maxRows 0}))
       (.then (fn [data]
                (let [cols (.getColumns data) rows (js->clj (.getData data) :keywordize-keys true )]
                (swap! app-state assoc 

@@ -24,6 +24,16 @@
   (js/setTimeout #(when (nil? (:state @app-state)) (request-summary-data)) 3000 )
   (comm/chsk-send! [:tableau/get-summary-data {:origin (str state/uniq-id "/container")}] ))
 
+(defn transpose [m]
+  (apply mapv vector m))
+
+(defn ^:export summary-data []
+  (let [sumdata (get-in @app-state [:tableau/summary-data 1])
+        transpose (fn [m] (apply mapv vector m))
+        data (:summary-data sumdata)
+        cols (:summary-columns sumdata)]
+    (debugf "sum data: %s" sumdata)
+    (clj->js (mapv #(zipmap ["date" "category" "year" "sales"] %) data))))
 
 (when (= "d3" state/controller)
   (state/when-change :chsk/handshake request-summary-data)
